@@ -1,6 +1,31 @@
 const express = require('express')
+const morgan = require('morgan')
+
 const app = express()
 
+app.use(express.json())
+
+// custom Token 
+morgan.token('body',(req)=>{
+    return req.method ==='POST' ? JSON.stringify(req.body):''
+})
+
+//Custom Log based On StatusCode
+app.use(
+    morgan(function (tokens, req, res) {
+        let log = [
+            tokens.method(req, res),
+            tokens.url(req, res),
+            tokens.status(req, res),
+            tokens.res(req, res, 'content-length'), '-',
+            tokens['response-time'](req, res), 'ms'
+          ];
+        if(req.method==='POST' && res.statusCode===200){
+            log.push(tokens.body(req,res))
+        }
+        return log.join(' ')
+      })
+  );
 
 let persons=[
     { 
@@ -32,7 +57,6 @@ const generateId = () => {
     return String(maxId + 1)
   }
 
-app.use(express.json())
 
 app.get('/info',(request, response)=>{
     let date = new Date()

@@ -2,7 +2,9 @@ const express = require('express')
 const morgan = require('morgan')
 
 const app = express()
+const cors = require('cors')
 
+app.use(cors())
 app.use(express.json())
 
 // custom Token 
@@ -50,6 +52,8 @@ let persons=[
     }
 ]
 
+app.use(express.static('dist'))
+
 const generateId = () => {
     const maxId = persons.length > 0
       ? Math.max(...persons.map(n => Number(n.id)))
@@ -66,6 +70,7 @@ app.get('/info',(request, response)=>{
 app.get('/api/persons',(request,response)=>{
     response.json(persons)
 })
+
 
 
 app.post('/api/persons',(request,response)=>{
@@ -90,6 +95,19 @@ app.post('/api/persons',(request,response)=>{
     response.json(person)
 })
 
+app.put('/api/persons/:id', (request, response) => {
+  const id = request.params.id;
+  const { name, number } = request.body;
+
+  const personIndex = persons.findIndex(p => p.id === id);
+  if (personIndex === -1) {
+      return response.status(404).json({ error: 'Person not found' });
+  }
+
+  persons[personIndex] = { id, name, number };
+  response.json(persons[personIndex]);
+});
+
 app.get('/api/persons/:id',(request,response)=>{
     let id = request.params.id
     let person = persons.find(p=>p.id===id)
@@ -101,6 +119,7 @@ app.get('/api/persons/:id',(request,response)=>{
 })
 
 
-const PORT = 3001
-app.listen(PORT)
-console.log(`Server is running on port ${PORT}`)
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})

@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd ../../HelsinkiFullstack/part2/phoneBook && npm run build && @powershell Copy-Item dist -Recurse ../../HelsinkiFullStack-Part3/Phonebook-Backend",
+    "deploy": "fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",
+    "logs:prod": "fly logs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,6 +18,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "mongoose": "^8.9.5",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
